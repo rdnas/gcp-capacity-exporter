@@ -173,7 +173,7 @@ helm upgrade --install capacity-exporter ./chart -n monitoring \
 `config.project_id` and `config.targets` are required, and rendering fails without them. To
 have Prometheus Operator scrape the exporter, set `serviceMonitor.enabled: true` and give
 `serviceMonitor.labels` labels matching your Prometheus `serviceMonitorSelector` (for example
-`prometheus: dsp-prometheus`).
+`prometheus: my-prometheus`).
 
 ## Using the series
 
