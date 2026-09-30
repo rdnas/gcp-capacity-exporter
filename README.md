@@ -29,9 +29,9 @@ All names start with `metric_prefix` (default `gce_capacity`).
   The monthly series is `hourly x hours_per_month` (default 730, the same default as ccc-costopt).
   Both come from one API call.
 - **Obtainability** is the likelihood of getting `size` Spot VMs of the machine type. Google
-  documents the bands as high >= 0.7 and medium >= 0.4. **Estimated uptime** is how long most
-  of those VMs are expected to run before preemption; documented values are 60, 600, and 3600
-  seconds.
+  documents the bands as high >= 0.7 and medium >= 0.4. 
+- **Estimated uptime** is how long most of those Spot VMs are expected to run before preemption; 
+  documented values are 60, 600, and 3600 seconds.
 - **Preemption rate** is the latest daily rate. Days start at midnight Pacific time, and the
   current day's rate is provisional (it changes during the day).
 - **Region-level series** have an empty `zone` label, which Prometheus drops. Query them with
