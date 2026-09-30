@@ -1,8 +1,8 @@
 # gcp-capacity-exporter
 
 Prometheus exporter for the GCE Capacity Advisor, the Compute Engine **beta** advice APIs. It
-exports Spot obtainability, estimated uptime, preemption rate, and price for an explicit list of
-regions, machine types, VM counts, and target distribution shapes.
+exports Spot obtainability score, estimated uptime, preemption rate, and price for an explicit
+list of regions, machine types, VM counts, and target distribution shapes.
 
 `advice/capacity` only returns a point-in-time score, and Google keeps no obtainability history.
 The only way to get daily or weekly averages (`avg_over_time(...[24h])`) is to collect the scores
