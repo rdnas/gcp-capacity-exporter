@@ -1,0 +1,29 @@
+# gcp-capacity-exporter configuration. Validate with:
+#   gcp-capacity-exporter --config config.example.yaml --check-config
+# Unknown keys are rejected, so typos fail at startup.
+
+project_id: my-project               # required: the project billed for the advice API calls
+listen: "0.0.0.0:9469"               # --listen overrides this
+metric_prefix: gce_capacity          # metric names are <prefix>_<name>
+
+scrape:
+  interval: 5m                       # cycle period; the first cycle runs at startup
+  timeout: 30s                       # per HTTP request
+  workers: 4                         # concurrent API calls
+  max_attempts: 4                    # per call, first try included (429/5xx/timeouts are retried)
+
+hours_per_month: 730                 # hourly -> monthly price (same default as ccc-costopt)
+
+# Which series to export. obtainability/estimated_uptime come from advice/capacity
+# (one call per machine type x size x shape); price/preemption_rate come from
+# advice/capacityHistory (one call per machine type, whatever the shapes or sizes).
+signals: [price, obtainability, preemption_rate, estimated_uptime]
+
+targets:
+  - region: us-east4
+    machine_types: [t2d-standard-8, n2d-standard-8]
+    sizes: [10, 50]                  # obtainability depends on the requested VM count
+    target_distribution_shapes: [ANY, BALANCED]  # one series per shape; default [ANY]
+    # Optional per-zone series: one ANY_SINGLE_ZONE capacity call per zone x size and one
+    # zonal preemption history call per zone, for every machine type of this target.
+    # zones: [us-east4-a, us-east4-c]

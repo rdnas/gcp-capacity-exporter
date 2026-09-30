@@ -1,0 +1,18 @@
+gcp-capacity-exporter scrapes the GCE advice APIs for project {{ .Values.config.project_id }} every {{ dig "scrape" "interval" "5m" .Values.config }}.
+
+Check it locally:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "gcp-capacity-exporter.fullname" . }} {{ .Values.service.port }}
+  curl -s localhost:{{ .Values.service.port }}/healthz
+  curl -s localhost:{{ .Values.service.port }}/metrics | grep '^{{ .Values.config.metric_prefix | default "gce_capacity" }}_'
+{{- if not .Values.serviceMonitor.enabled }}
+
+serviceMonitor.enabled is false: Prometheus Operator will not scrape this exporter
+until you enable it (and set serviceMonitor.labels to match its serviceMonitorSelector).
+{{- end }}
+{{- if and .Values.serviceAccount.create (not .Values.serviceAccount.gcpServiceAccount) }}
+
+serviceAccount.gcpServiceAccount is empty: the pod still needs Google credentials with
+compute.advice.capacity and compute.advice.capacityHistory (roles/compute.viewer), for
+example Workload Identity Federation granted directly to this Kubernetes service account.
+The exporter exits at startup when no credentials are found.
+{{- end }}

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gcp-capacity-exporter"
+version = "0.1.0"
+description = "Prometheus exporter for GCE Capacity Advisor Spot signals: obtainability, estimated uptime, preemption rate and price (compute beta advice APIs)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "prometheus-client>=0.20",
+    "PyYAML>=6.0",
+    "google-auth>=2.23",
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+]
+
+[project.scripts]
+gcp-capacity-exporter = "gcp_capacity_exporter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

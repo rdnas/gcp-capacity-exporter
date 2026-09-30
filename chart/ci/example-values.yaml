@@ -1,0 +1,16 @@
+# Example overrides (also used by `helm lint -f`); pair with your own image.
+config:
+  project_id: my-project
+  targets:
+    - region: us-east4
+      machine_types: [t2d-standard-8, n2d-standard-8]
+      sizes: [10, 50]
+      target_distribution_shapes: [ANY, BALANCED]
+
+serviceAccount:
+  gcpServiceAccount: capacity-exporter@my-project.iam.gserviceaccount.com
+
+serviceMonitor:
+  enabled: true
+  labels:
+    prometheus: my-prometheus

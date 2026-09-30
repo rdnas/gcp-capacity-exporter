@@ -1,0 +1,100 @@
+# Exporter configuration, rendered verbatim into the ConfigMap; the schema is
+# documented in config.example.yaml. project_id and targets are required. The
+# listen address is managed by the chart (see containerPort), so leave it out.
+config:
+  project_id: ""
+  metric_prefix: gce_capacity
+  scrape:
+    interval: 5m
+    timeout: 30s
+    workers: 4
+    max_attempts: 4
+  hours_per_month: 730
+  signals: [price, obtainability, preemption_rate, estimated_uptime]
+  targets: []
+  # - region: us-east4
+  #   machine_types: [t2d-standard-8, n2d-standard-8]
+  #   sizes: [10, 50]
+  #   target_distribution_shapes: [ANY, BALANCED]
+  #   zones: [us-east4-a]
+
+image:
+  repository: gcp-capacity-exporter  # e.g. us-east4-docker.pkg.dev/<project>/img/gcp-capacity-exporter
+  tag: ""  # defaults to the chart appVersion
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+logLevel: INFO
+containerPort: 9469
+
+serviceAccount:
+  create: true
+  name: ""
+  # GKE Workload Identity: the Google service account to impersonate. It needs
+  # compute.advice.capacity and compute.advice.capacityHistory on
+  # config.project_id (both are in roles/compute.viewer).
+  gcpServiceAccount: ""
+  annotations: {}
+  automount: true
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: [ALL]
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+# /healthz fails only when the scrape loop stops making progress, so a
+# restart is the right remedy; API errors never fail it.
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 5
+
+extraEnv: []
+
+service:
+  type: ClusterIP
+  port: 9469
+  annotations: {}
+
+# Requires the Prometheus Operator CRDs.
+serviceMonitor:
+  enabled: false
+  interval: 60s  # gauges change once per scrape.interval; more often only adds samples
+  scrapeTimeout: 10s  # /metrics serves a prepared snapshot and never calls the API
+  labels: {}  # must match the Prometheus serviceMonitorSelector, e.g. prometheus: my-prometheus
+  annotations: {}
+  relabelings: []
+  metricRelabelings: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

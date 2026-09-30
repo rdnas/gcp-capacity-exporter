@@ -1,0 +1,6 @@
+apiVersion: v2
+name: gcp-capacity-exporter
+description: Prometheus exporter for GCE Capacity Advisor Spot signals (obtainability, estimated uptime, preemption rate, price)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

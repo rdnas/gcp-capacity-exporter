@@ -1,0 +1,14 @@
+{{- $config := .Values.config | default dict }}
+{{- $_ := required "config.project_id is required (the project billed for the advice API calls)" $config.project_id }}
+{{- if not $config.targets }}
+{{- fail "config.targets must list at least one target (region, machine_types, sizes)" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "gcp-capacity-exporter.fullname" . }}
+  labels:
+    {{- include "gcp-capacity-exporter.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    {{- toYaml $config | nindent 4 }}
